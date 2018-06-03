@@ -1,4 +1,5 @@
-version: 2
+version: 2.0
+
 jobs:
   build:
     docker:
@@ -7,25 +8,29 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run build
+      - run:
+          name: Run Build
+          command: npm run build
 
   deploy:
-    docker:
-      - image: circleci/node:10.3.0-browsers
+    machine:
+        enabled: true
     working_directory: ~/repo
     steps:
       - checkout
       - run: npm install
-      - run: npm run deploy
+      - run:
+          name: Run Deploy
+          command: npm run deploy
 
 workflows:
   version: 2
-  commit:
+  build-and-deploy:
     jobs:
       - build
-      - deploy
-      filters:
-        branches:
-          only: develop
-    jobs:
-      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
